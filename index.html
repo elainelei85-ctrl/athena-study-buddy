@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>✨ Athena's Study Buddy</title>
+<style>
+  :root{
+    --bg1:#eef6ff; --bg2:#e7f0ff;
+    --card:#ffffff;
+    --pink:#ff8fb6; --pink-soft:#ffe1ee;
+    --blue:#5ab4ff; --blue-soft:#e1f1ff;
+    --yellow:#ffd56b; --yellow-soft:#fff4d6;
+    --green:#8fe3a8; --green-soft:#e4f9ec;
+    --purple:#9db8ff; --purple-soft:#e6ecff;
+    --ink:#3f4a63; --ink-soft:#8a96b3;
+    --shadow:0 8px 24px rgba(90,180,255,.20);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{margin:0;font-family:"Comic Sans MS","Baloo 2","PingFang SC",system-ui,"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;
+    background:linear-gradient(160deg,var(--bg1),var(--bg2));color:var(--ink);min-height:100vh;padding:14px 12px 60px;}
+  .wrap{max-width:760px;margin:0 auto;}
+
+  header.top{background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:30px;padding:16px 18px;color:#fff;box-shadow:var(--shadow);
+    display:flex;align-items:center;gap:14px;position:relative;overflow:hidden;}
+  header.top .ava{font-size:32px;background:rgba(255,255,255,.32);border-radius:50%;width:64px;height:64px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;cursor:pointer;position:relative;}
+  header.top .ava img{width:100%;height:100%;object-fit:cover;}
+  header.top .ava .cam{position:absolute;bottom:0;right:0;font-size:13px;background:rgba(0,0,0,.35);width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+  header.top h1{margin:0;font-size:22px;line-height:1.15;}
+  header.top .date{font-size:13px;opacity:.95;margin-top:2px;}
+  header.top .coin{position:absolute;right:16px;top:16px;font-size:20px;font-weight:800;background:rgba(255,255,255,.3);padding:5px 14px;border-radius:20px;}
+  header.top .trophy{position:absolute;right:16px;top:54px;font-size:22px;background:rgba(255,255,255,.3);padding:4px 12px;border-radius:20px;display:flex;align-items:center;gap:5px;}
+  header.top .trophy .nx{font-size:11px;opacity:.9;font-weight:700;}
+
+  /* animal friends shelf */
+  .shelf{background:var(--card);border-radius:24px;padding:14px 16px;box-shadow:var(--shadow);margin:14px 0;text-align:center;}
+  .shelf .title{font-size:14px;color:var(--ink-soft);font-weight:800;margin-bottom:10px;}
+  .friends{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;}
+  .friend{font-size:30px;filter:grayscale(1);opacity:.3;transition:.3s;position:relative;width:46px;height:46px;display:flex;align-items:center;justify-content:center;border-radius:50%;}
+  .friend.on{filter:none;opacity:1;animation:pop .4s;}
+  .friend.cur{box-shadow:0 0 0 3px var(--yellow);}
+  .friend.want{box-shadow:0 0 0 3px var(--blue);} .friend.want .nm{color:var(--blue);font-weight:800;}
+  .friend .nm{position:absolute;bottom:-13px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--ink-soft);white-space:nowrap;}
+  .friend.on .nm{color:var(--pink);font-weight:800;}
+  .shelf .unlocked{font-size:13px;color:var(--pink);font-weight:800;margin-top:16px;min-height:16px;}
+
+  /* my zoo */
+  .zoo{background:var(--card);border-radius:24px;padding:14px 16px;box-shadow:var(--shadow);margin:14px 0;text-align:center;}
+  .zoo .title{font-size:14px;color:var(--ink-soft);font-weight:800;margin-bottom:10px;}
+  .zoo .pets{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;min-height:40px;}
+  .zoo .pet{font-size:34px;animation:pop .4s;}
+  .zoo .empty{color:var(--ink-soft);font-size:13.5px;}
+
+  /* big progress */
+  .hero{background:var(--card);border-radius:24px;padding:18px;box-shadow:var(--shadow);margin:14px 0;text-align:center;}
+  .hero .ring{position:relative;width:150px;height:150px;margin:0 auto;}
+  .hero .ring svg{transform:rotate(-90deg);}
+  .hero .ring .ctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .hero .ring .ctr .pc{font-size:34px;font-weight:800;color:var(--pink);}
+  .hero .ring .ctr .lb{font-size:13px;color:var(--ink-soft);}
+  .hero .face{font-size:40px;margin-top:6px;}
+  .hero .sub{font-size:14px;color:var(--ink-soft);margin-top:2px;}
+
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 4px;}
+  .tab{border:none;background:#fff;color:var(--ink-soft);border-radius:18px;padding:10px 14px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:var(--shadow);}
+  .tab.active{background:linear-gradient(135deg,var(--blue),var(--purple));color:#fff;}
+
+  .section{background:var(--card);border-radius:24px;padding:16px 14px 8px;box-shadow:var(--shadow);margin-bottom:14px;}
+  .section h2{margin:0 0 10px;font-size:18px;display:flex;align-items:center;gap:8px;}
+  .section h2 .tag{font-size:12px;background:var(--pink-soft);color:var(--pink);padding:3px 10px;border-radius:20px;margin-left:auto;font-weight:700;}
+
+  .addrow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+  .addrow input,.addrow select{border:2px solid var(--pink-soft);border-radius:16px;padding:11px 12px;font-size:15px;outline:none;background:#fff;font-family:inherit;}
+  .addrow input[type=text]{flex:1;min-width:120px;}
+  .addrow input:focus,.addrow select:focus{border-color:var(--pink);}
+  .btn{border:none;border-radius:16px;padding:11px 16px;font-size:15px;font-weight:800;cursor:pointer;color:#fff;transition:transform .1s;font-family:inherit;}
+  .btn:active{transform:scale(.94);}
+  .btn.pink{background:linear-gradient(135deg,var(--blue),var(--purple));} .btn.blue{background:var(--blue);} .btn.green{background:var(--green);color:var(--ink);}
+  .btn.gray{background:#bbb;color:#fff;} .btn.sm{font-size:13px;padding:7px 12px;}
+
+  ul.list{list-style:none;margin:0;padding:0;}
+  li.item{display:flex;align-items:center;gap:11px;padding:12px;border-radius:18px;margin-bottom:9px;background:var(--bg1);transition:.2s;}
+  li.item.done{background:var(--green-soft);}
+  li.item.done .txt{text-decoration:line-through;color:#4a8a63;}
+  .chk{width:30px;height:30px;border-radius:50%;border:3px solid var(--pink);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;background:#fff;transition:.2s;}
+  li.item.done .chk{background:var(--pink);border-color:var(--pink);}
+  .txt{flex:1;min-width:90px;font-size:16px;word-break:break-word;}
+  .tagchip{font-size:11px;padding:2px 9px;border-radius:20px;font-weight:800;}
+  .tagchip.Reading{background:#e3f3ff;color:#3a8fd6;} .tagchip.Math{background:#ffe0e0;color:#e06868;}
+  .tagchip.Writing{background:#fff2cc;color:#c79a18;} .tagchip.Science{background:#e4f9ec;color:#3a9a63;} .tagchip.Other{background:#efe7ff;color:#8a5cd6;}
+  .del{background:none;border:none;color:#c9a0b5;cursor:pointer;font-size:18px;padding:2px 6px;border-radius:8px;}
+  .del:hover{background:#ffe0ec;}
+  .empty{color:var(--ink-soft);font-size:14px;text-align:center;padding:14px;}
+
+  .acts{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+  @media(max-width:520px){.acts{grid-template-columns:1fr;}}
+  .act-card{border-radius:22px;padding:14px;position:relative;box-shadow:var(--shadow);}
+  .act-card.abacus{background:var(--yellow-soft);} .act-card.piano{background:var(--blue-soft);}
+  .act-card.beast{background:var(--purple-soft);} .act-card.dog{background:var(--pink-soft);} .act-card.other{background:var(--pink-soft);}
+  .act-card .head{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:800;}
+  .act-card .emoji{font-size:26px;}
+  .act-card .mins{font-size:12px;color:var(--ink-soft);margin:5px 0 8px;}
+  .act-card .goalbar{height:8px;background:rgba(255,255,255,.7);border-radius:20px;overflow:hidden;margin:2px 0 8px;}
+  .act-card .goalbar>span{display:block;height:100%;background:var(--green);border-radius:20px;transition:width .5s;}
+  .act-card.done{outline:3px solid var(--green);}
+  .mini-row{display:flex;gap:6px;align-items:center;}
+  .mini-row input{width:62px;border:2px solid #fff;border-radius:12px;padding:7px 9px;font-size:14px;outline:none;font-family:inherit;}
+  .mini-btn{border:none;border-radius:12px;padding:7px 11px;font-size:13px;font-weight:800;cursor:pointer;background:#fff;color:var(--ink);font-family:inherit;}
+  .mini-check{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;border:3px solid var(--pink);background:#fff;cursor:pointer;font-size:18px;color:#fff;display:flex;align-items:center;justify-content:center;}
+  .act-card.done .mini-check{background:var(--green);border-color:var(--green);}
+  .goal-edit{font-size:11px;color:var(--ink-soft);cursor:pointer;text-decoration:underline;}
+
+  .reward{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:16px;margin-bottom:9px;background:var(--bg1);}
+  .reward .r-emoji{font-size:24px;} .reward .r-name{flex:1;font-size:15px;}
+  .reward .r-cost{font-size:13px;color:var(--pink);font-weight:800;}
+  .reward .r-btn{border:none;border-radius:14px;padding:9px 14px;font-size:14px;font-weight:800;cursor:pointer;background:var(--yellow);color:var(--ink);font-family:inherit;}
+  .reward .r-btn:disabled{background:#eee;color:#bbb;cursor:not-allowed;}
+  .reward.used{opacity:.6;} .reward.used .r-name{text-decoration:line-through;}
+  .reward .pending{font-size:12px;color:var(--blue);font-weight:800;}
+
+  /* weekly (Athena) */
+  .wk-hero{background:linear-gradient(135deg,var(--pink),var(--purple));border-radius:24px;padding:20px;color:#fff;text-align:center;box-shadow:var(--shadow);margin-bottom:14px;}
+  .wk-hero .big{font-size:40px;} .wk-hero .t{font-size:18px;font-weight:800;margin-top:4px;}
+  .wk-hero .s{font-size:14px;opacity:.95;margin-top:2px;}
+  .wk-stats{display:flex;gap:11px;flex-wrap:wrap;margin-bottom:14px;}
+  .wk-stat{flex:1;min-width:120px;background:var(--card);border-radius:20px;padding:14px;text-align:center;box-shadow:var(--shadow);}
+  .wk-stat .b{font-size:26px;font-weight:800;} .wk-stat .l{font-size:12px;color:var(--ink-soft);margin-top:2px;}
+  .claim{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:16px;background:var(--yellow-soft);margin-bottom:8px;font-size:14.5px;}
+  .claim .e{font-size:22px;}
+
+  /* parent */
+  .report-card{background:var(--bg1);border-radius:18px;padding:14px;margin-bottom:12px;}
+  .report-card h3{margin:0 0 10px;font-size:16px;}
+  .stat-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed #eee;font-size:14px;}
+  .stat-row:last-child{border-bottom:none;}
+  .stat-row .v{font-weight:800;color:var(--pink);}
+  .bar-mini{height:10px;background:#fff;border-radius:20px;overflow:hidden;margin-top:4px;}
+  .bar-mini>span{display:block;height:100%;background:var(--blue);border-radius:20px;}
+  .chart-title{font-size:13px;font-weight:800;color:var(--ink-soft);margin:12px 0 4px;}
+
+  /* calendar */
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+  .cal-dow{text-align:center;font-size:12px;color:var(--ink-soft);font-weight:800;padding-bottom:2px;}
+  .cal-cell{border-radius:14px;padding:8px 4px;min-height:60px;cursor:pointer;position:relative;text-align:center;font-size:13px;transition:transform .1s;}
+  .cal-cell:active{transform:scale(.95);}
+  .cal-cell .num{font-weight:800;font-size:13px;}
+  .cal-cell .face{font-size:19px;margin-top:3px;}
+  .cal-cell .pct{font-size:11px;color:var(--ink-soft);}
+  .cal-cell.blank{background:transparent;cursor:default;}
+  .cal-cell.today{outline:2px solid var(--pink);}
+
+  .cheer{position:fixed;inset:0;background:rgba(91,79,99,.4);display:none;align-items:center;justify-content:center;z-index:60;}
+  .cheer.show{display:flex;animation:pop .3s;}
+  .cheer .box{background:#fff;border-radius:28px;padding:26px 30px;text-align:center;box-shadow:0 14px 44px rgba(0,0,0,.22);max-width:320px;}
+  .cheer .emoji{font-size:58px;animation:spin 1s;}
+  .cheer .msg{font-size:21px;font-weight:800;margin:8px 0 3px;}
+  .cheer .sub{font-size:14px;color:var(--ink-soft);}
+  @keyframes pop{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
+  @keyframes spin{from{transform:rotate(-18deg) scale(.8)}to{transform:rotate(0) scale(1)}}
+  .confetti{position:fixed;top:-20px;width:10px;height:14px;z-index:55;pointer-events:none;border-radius:2px;}
+
+  .toast{position:fixed;top:14px;left:50%;transform:translateX(-50%);background:#fff;border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.2);padding:14px 18px;z-index:65;display:none;align-items:center;gap:10px;max-width:90%;}
+  .toast.show{display:flex;animation:pop .3s;}
+
+  footer{text-align:center;color:var(--ink-soft);font-size:12px;margin-top:8px;}
+
+  .modal{position:fixed;inset:0;background:rgba(91,79,99,.45);display:none;align-items:center;justify-content:center;z-index:70;}
+  .modal.show{display:flex;}
+  .modal .box{background:#fff;border-radius:24px;padding:22px;width:92%;max-width:380px;box-shadow:0 14px 44px rgba(0,0,0,.25);max-height:86vh;overflow:auto;}
+  .modal h3{margin:0 0 14px;font-size:18px;}
+  .modal input{width:100%;border:2px solid var(--pink-soft);border-radius:14px;padding:10px;font-size:15px;margin-bottom:12px;font-family:inherit;outline:none;}
+  .modal .row{display:flex;gap:8px;} .modal .row .btn{flex:1;}
+  .hidden{display:none;}
+  .page{display:none;} .page.active{display:block;}
+
+  /* night mode */
+  body.dark{background:linear-gradient(160deg,#2a2440,#1d2740);--card:#322b4a;--bg1:#2a2440;--bg2:#1d2740;
+    --ink:#ece8f5;--ink-soft:#a89fc0;--pink-soft:#4a3360;--blue-soft:#2e3a5c;--yellow-soft:#4a4226;--green-soft:#2c4636;--purple-soft:#3a2f56;}
+  body.dark .item{background:var(--bg1);} body.dark .reward{background:var(--bg1);}
+  body.dark .report-card{background:var(--bg1);} body.dark .shelf,.zoo{background:var(--card);}
+  body.dark .bar-mini{background:rgba(255,255,255,.12);} body.dark .goalbar{background:rgba(255,255,255,.12);}
+  body.dark .act-card.abacus{background:var(--yellow-soft);} body.dark .act-card.piano{background:var(--blue-soft);}
+  body.dark .act-card.beast{background:var(--purple-soft);} body.dark .act-card.dog{background:var(--pink-soft);} body.dark .act-card.other{background:var(--pink-soft);}
+  body.dark .friend:not(.on){opacity:.22;} body.dark textarea.sum,body.dark .addrow input,body.dark .addrow select{border-color:#4a4360;}
+
+  /* owl fly animation */
+  .owl{position:fixed;font-size:40px;z-index:58;pointer-events:none;}
+  @keyframes owlfly{0%{transform:translate(0,100vh) rotate(0)}100%{transform:translate(var(--dx),-20vh) rotate(var(--rot))}}
+
+  /* bestiary */
+  .best{background:var(--card);border-radius:20px;padding:12px 14px;margin-bottom:10px;display:flex;gap:12px;align-items:center;box-shadow:var(--shadow);}
+  .best .be{font-size:36px;width:48px;text-align:center;}
+  .best.locked{opacity:.5;}
+  .best .binfo .bn{font-size:15px;font-weight:800;}
+  .best .binfo .bd{font-size:12.5px;color:var(--ink-soft);}
+  .best .badge{margin-left:auto;font-size:12px;font-weight:800;padding:3px 10px;border-radius:20px;}
+  .best .badge.have{background:var(--green-soft);color:#3a9a63;}
+  .best .badge.lock{background:var(--pink-soft);color:var(--pink);}
+  .toggle{display:flex;align-items:center;gap:8px;justify-content:flex-end;margin-bottom:6px;font-size:13px;color:var(--ink-soft);}
+  .toggle .sw{width:46px;height:26px;border-radius:20px;background:#bbb;position:relative;cursor:pointer;transition:.2s;}
+  .toggle .sw.on{background:var(--purple);}
+  .toggle .sw:after{content:"";position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.2s;}
+  .toggle .sw.on:after{left:23px;}
+  .day-detail .dd-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed #eee;font-size:14px;}
+  .day-detail .dd-row:last-child{border-bottom:none;}
+  .parishint{font-size:12px;color:var(--ink-soft);margin:2px 0 12px;}
+  .quote{background:linear-gradient(135deg,var(--blue-soft),var(--purple-soft));border-radius:20px;padding:13px 16px;margin:12px 0;display:flex;gap:10px;align-items:center;box-shadow:var(--shadow);}
+  .quote .qe{font-size:30px;}
+  .quote .qt{font-size:14.5px;font-weight:700;color:var(--ink);line-height:1.35;}
+  .medals{display:flex;gap:10px;flex-wrap:wrap;}
+  .medal{display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--yellow-soft),var(--pink-soft));border-radius:18px;padding:9px 13px;box-shadow:var(--shadow);}
+  .medal .me{font-size:26px;animation:pop .4s;}
+  .medal .mt{font-size:13.5px;font-weight:800;}
+  .medal .md{font-size:11px;color:var(--ink-soft);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="ava" onclick="document.getElementById('avaFile').click()" title="Tap to change photo"><span id="avaEmoji">👧</span><span class="cam">📷</span></div>
+    <input type="file" id="avaFile" accept="image/*" class="hidden" onchange="uploadAva(event)">
+    <div><h1>✨ Athena's Study Buddy</h1><div class="date" id="todayDate"></div></div>
+    <div class="coin">🪙 <span id="coins">0</span></div>
+    <div class="trophy" id="trophyTop" title="Your streak friend">🐛 <span class="nx" id="trophyNext"></span></div>
+    <div class="trophy" id="nightBtn" onclick="toggleNight()" title="Day / Night" style="top:92px;cursor:pointer">🌞</div>
+    <div class="trophy" id="trophyTop" title="Your streak friend">🐛 <span class="nx" id="trophyNext"></span></div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showPage('today')">🌞 Today</button>
+    <button class="tab" onclick="showPage('weekly')">🎉 My Week</button>
+    <button class="tab" onclick="showPage('rewards')">🏅 Rewards</button>
+    <button class="tab" onclick="showPage('calendar')">📅 Calendar</button>
+    <button class="tab" onclick="showPage('bestiary')">📖 Animals</button>
+    <button class="tab" onclick="showPage('parent')">👨‍👩‍👧 Parent</button>
+  </div>
+
+  <!-- TODAY (Athena) -->
+  <div class="page active" id="page-today">
+    <div class="hero">
+      <div class="ring">
+        <svg width="150" height="150">
+          <circle cx="75" cy="75" r="64" fill="none" stroke="#ffe1ee" stroke-width="14"/>
+          <circle id="ringFg" cx="75" cy="75" r="64" fill="none" stroke="url(#rg)" stroke-width="14" stroke-linecap="round" stroke-dasharray="402" stroke-dashoffset="402"/>
+          <defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#8fe3a8"/><stop offset="100%" stop-color="#7cc6ff"/></linearGradient></defs>
+        </svg>
+        <div class="ctr"><div class="pc" id="ringPct">0%</div><div class="lb">done today</div></div>
+      </div>
+      <div class="face" id="heroFace">🌙</div>
+      <div class="sub" id="heroSub">Let's get started! 💪</div>
+    </div>
+
+    <div class="quote"><div class="qe" id="quoteEmoji">✨</div><div class="qt" id="quoteText">You are doing great, Athena!</div></div>
+
+    <div style="text-align:center;margin:6px 0 2px">
+      <button class="btn blue" id="mysteryBtn" onclick="openMystery()">🎁 Mystery Box</button>
+      <span id="mysteryHint" style="font-size:12px;color:var(--ink-soft);margin-left:8px"></span>
+    </div>
+
+    <div class="shelf">
+      <div class="title">🐾 My Animal Friends — collect them all by daily streaks!</div>
+      <div class="friends" id="trophyShelf"></div>
+      <div class="unlocked" id="trophyUnlocked"></div>
+    </div>
+
+    <div class="zoo">
+      <div class="title">🏡 My Zoo — adopt animals with your coins!</div>
+      <div class="pets" id="zooPets"></div>
+    </div>
+
+    <section class="section">
+      <h2>📚 School Work <span class="tag" id="hwTag">0</span></h2>
+      <div class="addrow">
+        <input type="text" id="hwInput" placeholder="Add school work, e.g. Math worksheet p.8">
+        <select id="hwTagSel"><option>Reading</option><option>Math</option><option>Writing</option><option>Science</option><option>Other</option></select>
+        <button class="btn pink" onclick="addHW()">＋</button>
+      </div>
+      <ul class="list" id="hwList"></ul>
+    </section>
+
+    <section class="section">
+      <h2>🎨 Activities <span class="tag" id="actTag">0/5</span></h2>
+      <div class="tip parishint">Tap ✅ when finished, write minutes. <span class="goal-edit" onclick="editGoals()">⚙ goals</span></div>
+      <div class="acts" id="acts"></div>
+    </section>
+
+    <section class="section">
+      <h2>📝 Today's Note</h2>
+      <textarea class="sum" id="summaryInput" placeholder="Today I..." onchange="saveSummary()" style="border:2px solid var(--pink-soft);border-radius:16px;padding:11px;font-size:14.5px;width:100%;min-height:60px;outline:none;font-family:inherit;resize:vertical;background:#fff;"></textarea>
+      <div class="rec" style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <button class="btn pink sm" id="recBtn" onclick="toggleRec()">🎤 Record a cheer</button>
+        <span id="recStatus" style="font-size:12.5px;color:var(--ink-soft)"></span>
+        <span id="recPlay" style="display:none;align-items:center;gap:6px">
+          <audio id="recAudio" controls style="height:32px"></audio>
+          <button class="btn gray sm" onclick="clearRec()">🗑</button>
+        </span>
+      </div>
+    </section>
+  </div>
+
+  <!-- MY WEEK (Athena) -->
+  <div class="page" id="page-weekly">
+    <div class="wk-hero">
+      <div class="big" id="wkFace">🌟</div>
+      <div class="t" id="wkTitle">You are amazing this week!</div>
+      <div class="s" id="wkSub"></div>
+    </div>
+    <div class="wk-stats">
+      <div class="wk-stat"><div class="b" id="wkDays">0/7</div><div class="l">days finished</div></div>
+      <div class="wk-stat"><div class="b" id="wkCoins">0</div><div class="l">🪙 earned</div></div>
+      <div class="wk-stat"><div class="b" id="wkRewards">0</div><div class="l">rewards got</div></div>
+    </div>
+    <div class="medals" id="wkMedals" style="margin-bottom:14px"></div>
+    <div class="report-card">
+      <h3>⏱ My activity minutes</h3>
+      <div id="wkActBars"></div>
+    </div>
+    <div class="report-card">
+      <h3>🎁 Rewards I earned</h3>
+      <div id="wkClaims"></div>
+    </div>
+  </div>
+
+  <!-- REWARDS (Athena) -->
+  <div class="page" id="page-rewards">
+    <section class="section">
+      <h2>🏅 Reward Store <span class="tag" id="coinTag">0 🪙</span></h2>
+      <div class="tip parishint">Spend coins on fun rewards! (Mom/Dad approves) <span class="goal-edit" onclick="openRewardModal()">＋ add</span></div>
+      <div id="rewards"></div>
+    </section>
+  </div>
+
+  <!-- CALENDAR -->
+  <div class="page" id="page-calendar">
+    <section class="section">
+      <h2>📅 Calendar <span class="tag" id="calMonth"></span></h2>
+      <div class="tip parishint">Each day is colored by how much you finished. Tap a day to see it!</div>
+      <div class="cal-grid" id="calDow"></div>
+      <div class="cal-grid" id="calGrid" style="margin-top:6px"></div>
+    </section>
+  </div>
+
+  <!-- BESTIARY (animals book) -->
+  <div class="page" id="page-bestiary">
+    <section class="section">
+      <h2>📖 My Animal Book</h2>
+      <div class="tip parishint">Every friend & animal you collect lives here. Keep your streak to meet them all! 🐾</div>
+      <div id="bestiary"></div>
+    </section>
+  </div>
+
+  <!-- PARENT (monthly/yearly detail) -->
+  <div class="page" id="page-parent">
+    <div class="tip parishint">👨‍👩‍👧 Parent view — monthly & yearly summary for review.</div>
+    <section class="section">
+      <h2>📆 This Month</h2>
+      <div id="monthMedals" class="medals"></div>
+      <div id="monthReport"></div>
+    </section>
+    <section class="section">
+      <h2>🏆 This Year</h2>
+      <div id="yearMedals" class="medals"></div>
+      <div id="yearReport"></div>
+    </section>
+    <section class="section">
+      <h2>⚙ Settings</h2>
+      <div class="reward"><div class="r-emoji">⏰</div><div class="r-name">Reminder 3:30 PM (California)</div><button class="r-btn" id="reminderBtn" style="background:var(--green)" onclick="toggleReminder()">On</button></div>
+      <div class="reward"><div class="r-emoji">👨‍👩‍👧</div><div class="r-name">Parent approval for rewards</div><button class="r-btn" id="approveBtn" style="background:var(--green)" onclick="toggleApproval()">On</button></div>
+      <div class="reward"><div class="r-emoji">⬇</div><div class="r-name">Export backup (JSON)</div><button class="r-btn" style="background:var(--blue)" onclick="exportData()">Export</button></div>
+      <div class="reward"><div class="r-emoji">⬆️</div><div class="r-name">Import backup (restore)</div><button class="r-btn" style="background:var(--green)" onclick="document.getElementById('importFile').click()">Import</button></div>
+      <input type="file" id="importFile" accept="application/json" class="hidden" onchange="importData(event)">
+      <div class="reward"><div class="r-emoji">🧹</div><div class="r-name">Clear TODAY only</div><button class="r-btn" style="background:#ff9a9a" onclick="resetToday()">Clear</button></div>
+    </section>
+  </div>
+
+  <footer>💡 Saved on this device. Parents: export monthly to keep a backup.</footer>
+</div>
+
+<div class="cheer" id="cheer"><div class="box"><div class="emoji" id="cheerEmoji">🎉</div><div class="msg" id="cheerMsg">Yay!</div><div class="sub" id="cheerSub">You did it!</div></div></div>
+<div class="toast" id="toast"><div style="font-size:30px">⏰</div><div><div style="font-weight:800;font-size:15px">Time for study time! 📚</div><div style="font-size:13px;color:var(--ink-soft)">It's 3:30 PM in California</div></div></div>
+
+<div class="modal" id="rewardModal"><div class="box"><h3>➕ Add a Reward</h3><input type="text" id="rName" placeholder="Reward name, e.g. Ice cream 🍦"><input type="number" id="rCost" placeholder="Cost in coins, e.g. 10" min="1"><div class="row"><button class="btn green" onclick="addReward()">Save</button><button class="btn blue" onclick="closeModal('rewardModal')">Cancel</button></div></div></div>
+<div class="modal" id="goalModal"><div class="box"><h3>⚙ Weekly Goals (minutes)</h3><div id="goalInputs"></div><div class="row"><button class="btn green" onclick="saveGoals()">Save</button><button class="btn blue" onclick="closeModal('goalModal')">Cancel</button></div></div></div>
+<div class="modal" id="approveModal"><div class="box"><h3>👨‍👩‍👧 Parent Approval</h3><p style="font-size:14px;margin:0 0 14px" id="approveText">Athena wants to claim this reward.</p><div class="row"><button class="btn green" onclick="confirmRedeem()">✅ Approve</button><button class="btn gray" onclick="closeModal('approveModal')">Cancel</button></div></div></div>
+<div class="modal" id="dayModal"><div class="box day-detail"><h3 id="dayModalTitle">Day</h3><div id="dayModalBody"></div><div class="row" style="margin-top:14px"><button class="btn blue" onclick="closeModal('dayModal')">Close</button></div></div></div>
+<div class="modal" id="mysteryModal"><div class="box" style="text-align:center">
+  <div id="mysteryEmoji" style="font-size:64px;animation:spin 1s">🎁</div>
+  <h3 id="mysteryTitle" style="margin:10px 0 6px">Mystery Box!</h3>
+  <div id="mysteryBody" style="font-size:14.5px;color:var(--ink-soft)">What's inside?</div>
+  <div class="row" style="margin-top:16px"><button class="btn pink" onclick="revealMystery()">✨ Open it!</button></div>
+</div></div>
+
+<script>
+const STORE_KEY="athena_study_buddy_v5";
+// animal friends unlocked by daily streak
+const FRIENDS=[
+  {days:3,  emoji:"🐛", name:"Caterpillar", desc:"Tiny but trying every day!"},
+  {days:7,  emoji:"🐰", name:"Bunny", desc:"Hoppy and happy — one week strong!"},
+  {days:14, emoji:"🦊", name:"Fox", desc:"Clever and loyal — two weeks!"},
+  {days:30, emoji:"🦄", name:"Unicorn", desc:"Magical! A whole month of streak!"},
+  {days:50, emoji:"🦉", name:"Owl", desc:"Athena's FAVORITE — wise super-star! 🌟"},
+];
+// adoptable animals in the shop (emoji -> {name, desc})
+const ZOO_INFO={
+  "🐼":{name:"Panda",desc:"Round, fluffy and calm — loves bamboo."},
+  "🐨":{name:"Koala",desc:"Sleepy cuddly bear from Australia."},
+  "🦁":{name:"Lion",desc:"Brave king of the animals!"},
+  "🐢":{name:"Turtle",desc:"Slow and steady wins the race."},
+};
+// daily encouragement quotes
+const QUOTES=[
+  {e:"🌟",t:"You are a shining star, Athena!"},
+  {e:"💪",t:"Little steps every day make big magic!"},
+  {e:"🐱",t:"Curious minds like yours change the world."},
+  {e:"🌈",t:"After a little work, come a rainbow of fun!"},
+  {e:"📚",t:"Reading opens doors to a million adventures."},
+  {e:"🎵",t:"Practice makes your heart sing — like piano!"},
+  {e:"🦉",t:"Wise owls learn a little every single day."},
+  {e:"⭐",t:"You've got this! One task at a time."},
+  {e:"🌸",t:"Be kind to yourself as you learn and grow."},
+  {e:"🚀",t:"Every finished task launches you higher!"},
+  {e:"🍎",t:"A healthy snack helps a happy brain."},
+  {e:"💡",t:"Mistakes are just how brains get stronger."},
+];
+// medals: id, emoji, name, desc, test(data)->bool
+const MEDALS=[
+  {id:"week_full",emoji:"🏅",name:"Perfect Week",desc:"Finished every day this week!",test:()=>{const wk=weekKeys();return wk.every(k=>{const s=dayStats(k);return s&&s.total>0&&s.done===s.total;});}},
+  {id:"month_full",emoji:"🎖️",name:"Perfect Month",desc:"Finished every day this month!",test:()=>{const y=new Date().getFullYear(),m=new Date().getMonth();const dim=new Date(y,m+1,0).getDate();let all=true;for(let d=1;d<=dim;d++){const k=ymd(y,m,d);const s=dayStats(k);if(!(s&&s.total>0&&s.done===s.total)){all=false;break;}}return all&&dim>0;}},
+  {id:"owl_club",emoji:"🦉",name:"Owl Club",desc:"Unlocked your favorite Owl (50-day streak)!",test:()=>(data._unlockedFriends||[]).includes(4)},
+  {id:"zoo5",emoji:"🏡",name:"Zoo Keeper",desc:"Adopted 5 animals in your Zoo!",test:()=>(data.zoo||[]).length>=5},
+];
+const ACTS=[{key:"abacus",name:"Abacus 珠心算",emoji:"🧮",cls:"abacus"},{key:"piano",name:"Piano 钢琴",emoji:"🎹",cls:"piano"},{key:"beast",name:"Beast Academy",emoji:"🦁",cls:"beast"},{key:"dog",name:"Dog Man 倒霉狗",emoji:"🐶",cls:"dog"},{key:"other",name:"Other 其他",emoji:"🎨",cls:"other"}];
+const TAGS=["Reading","Math","Writing","Science","Other"];
+const DEFAULT_GOALS={abacus:60,piano:90,beast:45,dog:30};
+const REMINDER_HOUR=15, REMINDER_MIN=30;
+
+function todayStr(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function ymd(y,m,d){return `${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;}
+function load(){try{return JSON.parse(localStorage.getItem(STORE_KEY))||{}}catch(e){return{}}}
+function save(d){localStorage.setItem(STORE_KEY,JSON.stringify(d));}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+
+let data=load();
+if(!data.profile) data.profile={avatar:null};
+if(!data.goals) data.goals={...DEFAULT_GOALS};
+if(data.coins===undefined) data.coins=0;
+if(!data.rewards) data.rewards=[{id:1,name:"🐼 Panda",cost:10,used:false},{id:2,name:"🐨 Koala",cost:15,used:false},{id:3,name:"🦁 Lion",cost:25,used:false},{id:4,name:"🐢 Turtle",cost:40,used:false}];
+if(!data.nextRewardId) data.nextRewardId=4;
+if(data.reminder===undefined) data.reminder=true;
+if(data.parentApproval===undefined) data.parentApproval=true;
+if(!data.pending) data.pending=[];
+if(!data.claims) data.claims=[]; // approved reward claims (for weekly summary)
+if(!data.zoo) data.zoo=[]; // adopted animal emojis (My Zoo)
+if(!data.wanted) data.wanted=null; // emoji of the animal Athena wants most
+
+let tKey=todayStr();
+if(!data[tKey]) data[tKey]={hw:[],acts:{},summary:"",earned:0};
+if(!data[tKey].acts) data[tKey].acts={};
+if(data[tKey].summary===undefined) data[tKey].summary="";
+if(data[tKey].earned===undefined) data[tKey].earned=0;
+if(data[tKey].voice===undefined) data[tKey].voice=""; // base64 audio
+if(data[tKey].mystery===undefined) data[tKey].mystery=false; // mystery box opened today
+ACTS.forEach(a=>{if(data[tKey].acts[a.key]===undefined) data[tKey].acts[a.key]={done:false,min:0,rate:0};});
+save(data);
+
+function weekKeys(){const now=new Date();const idx=now.getDay();const mon=(idx+6)%7;const keys=[];for(let k=0;k<7;k++){const d=new Date(now);d.setDate(now.getDate()-mon+k);keys.push(ymd(d.getFullYear(),d.getMonth(),d.getDate()));}return keys;}
+function ptNow(){const f=new Intl.DateTimeFormat("en-US",{timeZone:"America/Los_Angeles",hour12:false,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"});const p={};f.formatToParts(new Date()).forEach(x=>{if(x.type!=="literal")p[x.type]=+x.value;});return p;}
+function ptOffsetHours(){
+  const now=new Date();
+  const la=new Intl.DateTimeFormat("en-US",{timeZone:"America/Los_Angeles",hour12:false,hour:"numeric",minute:"numeric",second:"numeric"}).format(now);
+  const utc=new Intl.DateTimeFormat("en-US",{timeZone:"UTC",hour12:false,hour:"numeric",minute:"numeric",second:"numeric"}).format(now);
+  const toMin=s=>{const[a,b]=s.split(":").map(Number);return a*60+b;};
+  let diff=toMin(la)-toMin(utc); // minutes LA - UTC (negative, LA behind)
+  if(diff>720) diff-=1440; if(diff<-720) diff+=1440; // wrap
+  return diff/60; // PT behind UTC -> negative (e.g. -7)
+}
+
+function showPage(id){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById("page-"+id).classList.add("active");
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  const map={today:0,weekly:1,rewards:2,calendar:3,bestiary:4,parent:5};
+  document.querySelectorAll(".tab")[map[id]].classList.add("active");
+  if(id==="weekly") renderWeekly();
+  if(id==="parent") renderParent();
+  if(id==="calendar") renderCalendar();
+  if(id==="bestiary") renderBestiary();
+}
+
+function render(){
+  const dt=new Date();const wk=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][dt.getDay()];
+  document.getElementById("todayDate").textContent=`${dt.getMonth()+1}/${dt.getDate()}/${dt.getFullYear()}  ${wk}`;
+  const ava=document.getElementById("avaEmoji");
+  if(data._owlUntil && Date.now()<data._owlUntil){ava.textContent="🦉";ava.style.fontSize="40px";}
+  else if(data.profile.avatar) ava.innerHTML=`<img src="${data.profile.avatar}" alt="">`; else {ava.textContent="👧";ava.style.fontSize="";}
+  renderQuote();renderVoice();updateMysteryHint();
+  const day=data[tKey];
+  document.getElementById("summaryInput").value=day.summary||"";
+
+  const hwList=document.getElementById("hwList");hwList.innerHTML="";
+  if(day.hw.length===0) hwList.innerHTML='<div class="empty">No school work yet — add one! 📝</div>';
+  day.hw.forEach((it,i)=>{
+    const li=document.createElement("li");li.className="item"+(it.done?" done":"");
+    li.innerHTML=`<div class="chk" onclick="toggleHW(${i})">${it.done?"✓":""}</div><div class="txt">${esc(it.text)}</div><span class="tagchip ${it.tag||"Other"}">${it.tag||"Other"}</span><button class="del" onclick="delHW(${i})">✕</button>`;
+    hwList.appendChild(li);
+  });
+  document.getElementById("hwTag").textContent=day.hw.length;
+
+  const actsBox=document.getElementById("acts");actsBox.innerHTML="";let actDone=0,actMin=0;
+  const wkArr=weekKeys();
+  ACTS.forEach(a=>{
+    const st=day.acts[a.key];if(st.done) actDone++; actMin+=Number(st.min)||0;
+    let wkMin=0;wkArr.forEach(k=>{if(data[k]&&data[k].acts&&data[k].acts[a.key]) wkMin+=Number(data[k].acts[a.key].min)||0;});
+    const goal=Number(data.goals[a.key])||0;const gp=goal?Math.min(100,Math.round(wkMin/goal*100)):0;
+    const card=document.createElement("div");card.className="act-card "+a.cls+(st.done?" done":"");
+
+    card.innerHTML=`<div class="mini-check" onclick="toggleAct('${a.key}')">${st.done?"✓":""}</div>
+      <div class="head"><span class="emoji">${a.emoji}</span>${a.name}</div>
+      <div class="mins">⏱ ${st.min?st.min:"0"} min today · week ${wkMin}/${goal}</div>
+      <div class="goalbar"><span style="width:${gp}%"></span></div>
+      <div class="mini-row"><input type="number" min="0" placeholder="min" value="${st.min||""}" id="min_${a.key}" onchange="setMin('${a.key}',this.value)"><button class="mini-btn" onclick="quickMin('${a.key}',15)">+15</button></div>`;
+    actsBox.appendChild(card);
+  });
+  document.getElementById("actTag").textContent=actDone+"/"+ACTS.length;
+  document.getElementById("actTotal")&&(document.getElementById("actTotal").textContent=actMin+" min");
+
+  document.getElementById("coins").textContent=data.coins;
+  document.getElementById("coinTag").textContent=data.coins+" 🪙";
+
+  // hero ring
+  const total=day.hw.length+ACTS.length;const done=day.hw.filter(x=>x.done).length+actDone;
+  const pct=total?Math.round(done/total*100):0;
+  const C=2*Math.PI*64;document.getElementById("ringFg").style.strokeDashoffset=C*(1-pct/100);
+  document.getElementById("ringPct").textContent=pct+"%";
+  document.getElementById("heroFace").textContent=pct>=100?"🏆":pct>=60?"😊":pct>0?"🙂":"🌙";
+  document.getElementById("heroSub").textContent=pct>=100?"All done! You're a star ⭐":pct>=60?"Great progress!":"Let's keep going 💪";
+
+  document.getElementById("reminderBtn").textContent=data.reminder?"On":"Off";
+  document.getElementById("reminderBtn").style.background=data.reminder?"var(--green)":"#bbb";
+  document.getElementById("approveBtn").textContent=data.parentApproval?"On":"Off";
+  document.getElementById("approveBtn").style.background=data.parentApproval?"var(--green)":"#bbb";
+
+  renderFriends();
+  renderZoo();
+  renderRewards();
+}
+
+// ---------- streak & animal friends ----------
+function calcStreak(){let s=0;const now=new Date();
+  for(let i=0;i<400;i++){const d=new Date(now);d.setDate(now.getDate()-i);const key=ymd(d.getFullYear(),d.getMonth(),d.getDate());const dd=data[key];
+    if(dd){const total=dd.hw.length+ACTS.length;const done=dd.hw.filter(x=>x.done).length+ACTS.filter(a=>dd.acts&&dd.acts[a.key]&&dd.acts[a.key].done).length;if(total>0&&done>0){s++;continue;}}
+    if(i===0)continue;break;}
+  return s;
+}
+function unlockedFriends(streak){
+  // return list of unlocked friend indices
+  return FRIENDS.map((f,i)=>streak>=f.days?i:-1).filter(i=>i>=0);
+}
+function renderFriends(){
+  const streak=calcStreak();
+  const unlocked=unlockedFriends(streak);
+  const topIdx=unlocked.length?unlocked[unlocked.length-1]:-1;
+  // top badge
+  const top=document.getElementById("trophyTop");
+  const nx=document.getElementById("trophyNext");
+  if(topIdx>=0){top.firstChild.textContent=FRIENDS[topIdx].emoji+" ";nx.textContent=streak+"🔥";}
+  else{top.firstChild.textContent="🥚 ";nx.textContent=streak+"🔥";} // egg until first unlock
+  // shelf
+  const shelf=document.getElementById("trophyShelf");shelf.innerHTML="";
+  FRIENDS.forEach((f,i)=>{
+    const on=unlocked.includes(i);
+    const cur=i===topIdx;
+    const want=data.wanted===f.emoji;
+    const el=document.createElement("div");
+    el.className="friend"+(on?" on":"")+(cur?" cur":"")+(want?" want":"");
+    el.title=f.name+" ("+f.days+" days)"+(want?" — you want this! 💙":"");
+    el.innerHTML=`${f.emoji}<span class="nm">${want?"💙":f.days+"d"}</span>`;
+    shelf.appendChild(el);
+  });
+  const msg=document.getElementById("trophyUnlocked");
+  if(topIdx>=0){
+    const next=FRIENDS[topIdx+1];
+    msg.textContent=next?`You have ${FRIENDS[topIdx].name}! Next: ${next.emoji} ${next.name} at ${next.days}-day streak 🔥`:`🌟 You collected ALL friends — including your favorite ${FRIENDS[topIdx].emoji} Owl! 🦉`;
+  } else {
+    msg.textContent=`Do a little every day! First friend 🐛 at 3-day streak 🔥`;
+  }
+}
+function checkUnlocks(){
+  const streak=calcStreak();
+  const prev=data._unlockedFriends||[];
+  const nowU=unlockedFriends(streak);
+  // newly unlocked?
+  const newly=nowU.filter(i=>!prev.includes(i));
+  if(newly.length){
+    const idx=newly[newly.length-1];
+    const f=FRIENDS[idx];
+    data._unlockedFriends=nowU;save(data);
+    if(idx===FRIENDS.length-1 && f.emoji==="🦉"){
+      owlSwarm();
+      const c=document.getElementById("cheer");
+      document.getElementById("cheerEmoji").textContent="🦉";
+      document.getElementById("cheerMsg").textContent="You found your favorite! 🦉";
+      document.getElementById("cheerSub").textContent="The wise Owl joins you — super star! 🌟";
+      c.classList.add("show");setTimeout(()=>c.classList.remove("show"),2600);
+      owlAvatar(); // Athena's avatar becomes an owl for 30s
+    } else { cheerFriend(f); }
+  } else if(JSON.stringify(prev)!==JSON.stringify(nowU)){
+    data._unlockedFriends=nowU;save(data);
+  }
+}
+function cheerFriend(f){
+  const c=document.getElementById("cheer");
+  document.getElementById("cheerEmoji").textContent=f.emoji;
+  document.getElementById("cheerMsg").textContent="New friend unlocked!";
+  document.getElementById("cheerSub").textContent=`You got ${f.name} 🎉 keep your streak!`;
+  c.classList.add("show");setTimeout(()=>c.classList.remove("show"),1900);
+  confettiBurst();
+}
+function renderZoo(){
+  const box=document.getElementById("zooPets");
+  if(!data.zoo||data.zoo.length===0){box.innerHTML='<div class="empty">No animals yet — finish your tasks to earn 🪙, then Adopt one! 🐾</div>';return;}
+  box.innerHTML=data.zoo.map(e=>`<span class="pet" title="Adopted!">${e}</span>`).join("");
+}
+function renderQuote(){
+  // pick a stable quote for today (so it doesn't change on every refresh)
+  const seed=todayStr().split("-").reduce((a,c)=>a+ (+c||0),0);
+  const q=QUOTES[seed%QUOTES.length];
+  document.getElementById("quoteEmoji").textContent=q.e;
+  document.getElementById("quoteText").textContent=q.t;
+}
+function renderMedals(boxId){
+  const box=document.getElementById(boxId);if(!box)return;
+  const earned=MEDALS.filter(m=>{try{return m.test();}catch(e){return false;}});
+  if(earned.length===0){box.innerHTML='<div class="empty">Keep going to earn special medals! 🏅</div>';return;}
+  box.innerHTML=earned.map(m=>`<div class="medal"><div class="me">${m.emoji}</div><div><div class="mt">${m.name}</div><div class="md">${m.desc}</div></div></div>`).join("");
+}
+
+// ---------- night mode ----------
+// sunset hour (decimal) for Los Angeles using a simple solar equation
+function laSunsetHour(){
+  const now=new Date();
+  const start=new Date(now.getFullYear(),0,0);
+  const dayOfYear=Math.floor((now-start)/86400000);
+  const lat=34.05*Math.PI/180;
+  const decl=0.40928*Math.sin(2*Math.PI*(dayOfYear-79)/365);
+  const halfDay=Math.acos(-Math.tan(lat)*Math.tan(decl)); // radians
+  const daylightHours=halfDay*24/Math.PI;
+  // solar sunset at time-zone meridian (120W) = 12 + halfDay; LA is UTC-8 std, shift by (utcOff+8) for PDT/PST
+  return 12 + daylightHours/2 + (ptOffsetHours() + 8);
+}
+function applyNight(){const dk=(data.night==="on")||(data.night==="auto"&&nightNow());
+  document.body.classList.toggle("dark",dk);
+  const btn=document.getElementById("nightBtn");if(btn)btn.textContent=dk?"🌙":"🌞";
+  localStorage.setItem("athena_night","1");
+}
+function nightNow(){
+  if(data.night==="auto"){
+    const p=ptNow();const h=p.hour+p.minute/60;
+    return h>=laSunsetHour()||h<6;
+  }
+  const h=new Date().getHours();return h>=21||h<6;
+}
+function toggleNight(){
+  if(data.night==="auto"||data.night===undefined) data.night="on";
+  else if(data.night==="on") data.night="off";
+  else data.night="auto";
+  save(data);applyNight();
+}
+
+// ---------- bestiary ----------
+function renderBestiary(){
+  const streak=calcStreak();
+  const unlocked=unlockedFriends(streak);
+  const zooSet=new Set(data.zoo||[]);
+  const box=document.getElementById("bestiary");let h="";
+  const animals=[];
+  FRIENDS.forEach((f,i)=>{animals.push({em:f.emoji,key:f.emoji,name:f.name,desc:f.desc,
+    have:unlocked.includes(i)||(data._unlockedFriends&&data._unlockedFriends.includes(i)),
+    badge:f.days+"d"});});
+  Object.keys(ZOO_INFO).forEach(em=>{const z=ZOO_INFO[em];animals.push({em,key:em,name:z.name,desc:z.desc,
+    have:zooSet.has(em),badge:""});});
+  animals.forEach(a=>{
+    const want=data.wanted===a.key;
+    const badge=a.have?(a.badge?a.badge+" ✔":"Adopted 🏡"):(a.badge?("need "+a.badge):"in shop");
+    const wantBtn=`<button class="r-btn ${want?"":"sm"}" style="background:${want?"var(--blue)":"#eee"};color:${want?"#fff":"#999"};min-width:64px" onclick="toggleWant('${a.key}')">${want?"💙 want":"want"}</button>`;
+    h+=`<div class="best ${a.have?"":"locked"}"><div class="be">${a.em}</div>
+      <div class="binfo"><div class="bn">${a.name}</div><div class="bd">${a.desc}</div></div>
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;margin-left:auto">
+        <div class="badge ${a.have?"have":"lock"}">${badge}</div>${wantBtn}</div></div>`;
+  });
+  box.innerHTML=h;
+}
+function toggleWant(key){
+  data.wanted=(data.wanted===key)?null:key;save(data);renderBestiary();
+  if(data.wanted){const a=[...FRIENDS,...Object.keys(ZOO_INFO).map(k=>({emoji:k,...ZOO_INFO[k]}))].find(x=>x.emoji===key);
+    cheer("Added to your wish! 💙", a?a.name+" is on your list 🐾":"");
+  }
+}
+
+// ---------- owl mega animation ----------
+function owlSwarm(){
+  for(let i=0;i<18;i++){
+    const o=document.createElement("div");o.className="owl";o.textContent="🦉";
+    const dx=(Math.random()*120-60)+"vw";const rot=(Math.random()*720-360)+"deg";
+    const dur=2.4+Math.random()*1.8;const delay=Math.random()*0.8;
+    o.style.left=Math.random()*100+"vw";o.style.setProperty("--dx",dx);o.style.setProperty("--rot",rot);
+    o.style.animation=`owlfly ${dur}s ease-in ${delay}s forwards`;
+    document.body.appendChild(o);setTimeout(()=>o.remove(),(dur+delay)*1000);
+  }
+  // super-star banner
+  const banner=document.createElement("div");
+  banner.textContent="🦉 Athena is a SUPER STAR! 🦉";
+  banner.style.cssText="position:fixed;top:40%;left:50%;transform:translate(-50%,-50%) scale(0);z-index:59;font-family:inherit;font-size:30px;font-weight:800;color:#fff;text-shadow:0 3px 12px rgba(90,180,255,.8);background:linear-gradient(135deg,#5ab4ff,#9db8ff);padding:18px 30px;border-radius:26px;box-shadow:0 14px 44px rgba(90,180,255,.5);text-align:center;";
+  banner.animate([{transform:"translate(-50%,-50%) scale(0)",opacity:0},{transform:"translate(-50%,-50%) scale(1.1)",opacity:1,offset:.2},{transform:"translate(-50%,-50%) scale(1)",opacity:1,offset:.8},{transform:"translate(-50%,-50%) scale(1.15)",opacity:0}],{duration:3200,easing:"ease-in-out"});
+  document.body.appendChild(banner);setTimeout(()=>banner.remove(),3200);
+}
+function owlAvatar(){
+  data._owlUntil=Date.now()+30000;save(data);
+  paintOwlAvatar();
+  setTimeout(()=>{if(Date.now()>=data._owlUntil){data._owlUntil=0;save(data);render();}},30000);
+}
+function paintOwlAvatar(){
+  const ava=document.getElementById("avaEmoji");
+  ava.textContent="🦉";ava.style.fontSize="40px";
+  ava.animate([{transform:"scale(1)"},{transform:"scale(1.3)"},{transform:"scale(1)"}],{duration:600,easing:"ease-in-out"});
+}
+function renderRewards(){
+  const box=document.getElementById("rewards");box.innerHTML="";
+  if(data.rewards.length===0){box.innerHTML='<div class="empty">No animals yet — add one in Parent tab!</div>';}
+  data.rewards.forEach(r=>{
+    const pending=data.pending.includes(r.id);const can=data.coins>=r.cost && !r.used && !pending;
+    const el=document.createElement("div");el.className="reward"+(r.used?" used":"");
+    el.innerHTML=`<div class="r-emoji">${r.used?"🏡":(pending?"⏳":(can?"🎁":"🔒"))}</div><div class="r-name">${esc(r.name)}</div><div class="r-cost">${r.cost} 🪙</div>${pending?`<span class="pending">waiting</span>`:`<button class="r-btn" ${can?"":"disabled"} onclick="askRedeem(${r.id})">${r.used?"Adopted!":"Adopt"}</button>`}`;
+    box.appendChild(el);
+  });
+}
+
+// ---------- weekly (Athena) ----------
+function renderWeekly(){
+  const wkArr=weekKeys();
+  let days=0,coins=0,rewards=0;
+  wkArr.forEach(k=>{
+    const dd=data[k];if(!dd) return;
+    const total=dd.hw.length+ACTS.length;const done=dd.hw.filter(x=>x.done).length+ACTS.filter(a=>dd.acts&&dd.acts[a.key]&&dd.acts[a.key].done).length;
+    if(total>0&&done>0) days++;
+    coins+=(dd.hw.filter(x=>x.done).length*1 + ACTS.filter(a=>dd.acts&&dd.acts[a.key]&&dd.acts[a.key].done).length*2);
+  });
+  // rewards claimed this week
+  const wkSet=new Set(wkArr);
+  const claims=data.claims.filter(c=>wkSet.has(c.date));
+  rewards=claims.length;
+  document.getElementById("wkDays").textContent=days+"/7";
+  document.getElementById("wkCoins").textContent=coins;
+  document.getElementById("wkRewards").textContent=rewards;
+  const face=days>=7?"🏆":days>=5?"🌟":days>=3?"😊":"🌱";
+  document.getElementById("wkFace").textContent=face;
+  document.getElementById("wkTitle").textContent=days>=7?"Perfect week — super star! ⭐":days>=5?"Great week, Athena! 🌟":days>=3?"Good week! Keep it up 💪":"Let's do more next week 🌱";
+  document.getElementById("wkSub").textContent=`You earned ${coins} 🪙 and got ${rewards} reward${rewards===1?"":"s"}!`;
+
+  // activity bars (this week)
+  let actBreak={};ACTS.forEach(a=>actBreak[a.key]=0);
+  wkArr.forEach(k=>{ACTS.forEach(a=>{const st=data[k]&&data[k].acts&&data[k].acts[a.key];if(st)actBreak[a.key]+=Number(st.min)||0;});});
+  const max=Math.max(1,...ACTS.map(a=>actBreak[a.key]));
+  let h="";
+  ACTS.forEach(a=>{const v=actBreak[a.key];h+=`<div style="margin:8px 0"><div style="font-size:13.5px">${a.emoji} ${a.name.split(" ")[0]} <b>${v} min</b></div><div class="bar-mini"><span style="width:${Math.round(v/max*100)}%"></span></div></div>`;});
+  document.getElementById("wkActBars").innerHTML=h||'<div class="empty">No activity yet this week 🌱</div>';
+
+  // claims list
+  let c="";
+  claims.forEach(cl=>{c+=`<div class="claim"><span class="e">🎁</span><span>${esc(cl.name)}</span></div>`;});
+  document.getElementById("wkClaims").innerHTML=c||'<div class="empty">No rewards claimed yet — save your coins! 🪙</div>';
+  renderMedals("wkMedals");
+}
+
+// ---------- parent ----------
+function dayStats(key){const dd=data[key];if(!dd) return null;
+  const hwDone=dd.hw.filter(x=>x.done).length,hwTotal=dd.hw.length;
+  const actDone=ACTS.filter(a=>dd.acts&&dd.acts[a.key]&&dd.acts[a.key].done).length;
+  let actMin=0,rateSum=0,rateN=0;
+  ACTS.forEach(a=>{const st=dd.acts&&dd.acts[a.key];if(st){actMin+=Number(st.min)||0;if(st.rate){rateSum+=st.rate;rateN++;}}});
+  dd.hw.forEach(x=>{if(x.rate){rateSum+=x.rate;rateN++;}});
+  const total=hwTotal+ACTS.length,done=hwDone+actDone;
+  return {hwDone,hwTotal,actDone,total,done,pct:total?Math.round(done/total*100):0,actMin,avgRate:rateN?Math.round(rateSum/rateN*10)/10:0,hasData:total>0};}
+function rangeKeys(y,m){const keys=[];if(m===undefined){for(let mo=0;mo<12;mo++){const dim=new Date(y,mo+1,0).getDate();for(let d=1;d<=dim;d++)keys.push(ymd(y,mo,d));}}else{const dim=new Date(y,m+1,0).getDate();for(let d=1;d<=dim;d++)keys.push(ymd(y,m,d));}return keys;}
+function aggregate(keys){let days=0,totPct=0,actMin=0,rateSum=0,rateN=0,actBreak={},tagBreak={};ACTS.forEach(a=>actBreak[a.key]=0);TAGS.forEach(t=>tagBreak[t]=0);
+  keys.forEach(k=>{const s=dayStats(k);if(!s||!s.hasData)return;days++;totPct+=s.pct;actMin+=s.actMin;if(s.avgRate){rateSum+=s.avgRate;rateN++;}
+    ACTS.forEach(a=>{const st=data[k]&&data[k].acts&&data[k].acts[a.key];if(st)actBreak[a.key]+=Number(st.min)||0;});
+    const dd=data[k];dd.hw.forEach(x=>{if(x.tag)tagBreak[x.tag]++;});});
+  return {days,avgPct:days?Math.round(totPct/days):0,actMin,avgRate:rateN?Math.round(rateSum/rateN*10)/10:0,actBreak,tagBreak};}
+function barChart(items){if(items.length===0) return '<div class="empty">No data yet 🌱</div>';const W=560,rowH=34,pad=120,H=items.length*rowH+10;const max=Math.max(1,...items.map(i=>i.val));
+  let bars="";items.forEach((it,i)=>{const y=8+i*rowH;const bw=Math.round(it.val/max*(W-pad-40));bars+=`<text x="${pad-8}" y="${y+15}" font-size="12.5" fill="#5b4f63" text-anchor="end">${it.emoji||""} ${it.label}</text><rect x="${pad}" y="${y+4}" width="${bw}" height="18" rx="9" fill="#7cc6ff"/><text x="${pad+bw+8}" y="${y+18}" font-size="12.5" fill="#8a5cd6" font-weight="800">${it.val}${it.unit||""}</text>`;});
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%">${bars}</svg>`;}
+function lineChart(values,titles){const W=560,H=150,pad=24;const step=(W-pad*2)/(values.length-1||1);let pts="",area="";
+  values.forEach((v,i)=>{const x=pad+i*step;const y=H-pad-(v/100)*(H-pad*2);pts+=`${x},${y} `;});area=`${pad},${H-pad} `+pts+`${W-pad},${H-pad}`;
+  let grid="",dots="",lbls="";for(let g=0;g<=2;g++){const y=pad+g*(H-pad*2)/2;grid+=`<line x1="${pad}" y1="${y}" x2="${W-pad}" y2="${y}" stroke="#eee" stroke-width="1"/>`;}
+  values.forEach((v,i)=>{const x=pad+i*step;const y=H-pad-(v/100)*(H-pad*2);dots+=`<circle cx="${x}" cy="${y}" r="4" fill="#ff8fb6"/>`;lbls+=`<text x="${x}" y="${H-6}" font-size="11" fill="#a99fb3" text-anchor="middle">${titles[i]}</text>`;});
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%"><defs><linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff8fb6" stop-opacity=".35"/><stop offset="100%" stop-color="#ff8fb6" stop-opacity="0"/></linearGradient></defs>${grid}<polygon points="${area}" fill="url(#lg)"/><polyline points="${pts}" fill="none" stroke="#ff8fb6" stroke-width="3" stroke-linejoin="round"/>${dots}${lbls}</svg>`;}
+function reportCard(title,agg){
+  let h=`<div class="report-card"><h3>${title}</h3>`;
+  h+=`<div class="stat-row"><span>Active days</span><span class="v">${agg.days}</span></div>`;
+  h+=`<div class="stat-row"><span>Avg completion</span><span class="v">${agg.avgPct}%</span></div>`;
+  h+=`<div class="stat-row"><span>Total activity time</span><span class="v">${agg.actMin} min</span></div>`;
+  h+=`<div class="stat-row"><span>Avg focus rating</span><span class="v">${agg.avgRate?agg.avgRate+" ⭐":"–"}</span></div>`;
+  h+=`<div class="chart-title">⏱ Activity minutes</div>${barChart(ACTS.map(a=>({label:a.name.split(" ")[0],emoji:a.emoji,val:agg.actBreak[a.key]||0,unit:"m"})))}`;
+  const tagItems=TAGS.filter(t=>agg.tagBreak[t]>0).map(t=>({label:t,val:agg.tagBreak[t]}));
+  if(tagItems.length){h+=`<div class="chart-title">📚 Homework by tag</div>${barChart(tagItems)}`;}
+  h+=`</div>`;return h;
+}
+function renderParent(){const now=new Date();const y=now.getFullYear(),m=now.getMonth();
+  renderMedals("monthMedals");renderMedals("yearMedals");
+  document.getElementById("monthReport").innerHTML=reportCard(now.toLocaleString("en-US",{month:"long"})+" "+y,aggregate(rangeKeys(y,m)));
+  document.getElementById("yearReport").innerHTML=reportCard("Year "+y,aggregate(rangeKeys(y)));}
+
+// monthly backup reminder (shows on the 1st of each month)
+function checkBackupReminder(){
+  const now=new Date();
+  if(now.getDate()!==1) return; // only on the 1st
+  const key="lastBackupRemind_"+now.getFullYear()+"_"+(now.getMonth()+1);
+  if(localStorage.getItem(key)) return;
+  localStorage.setItem(key,"1");
+  setTimeout(()=>{
+    if(confirm("📤 New month! Tap Export in Parent tab to back up Athena's records so nothing gets lost. Remind you next month too?")){
+      showPage("parent");
+    }
+  },1200);
+}
+// ---------- calendar ----------
+function heatColor(pct){if(pct>=100)return "#8fe3a8";if(pct>=70)return "#cdeedd";if(pct>=40)return "#fff0c2";if(pct>0)return "#ffe1ee";return "#f4eef7";}
+function renderCalendar(){const now=new Date();const y=now.getFullYear(),m=now.getMonth();
+  document.getElementById("calMonth").textContent=now.toLocaleString("en-US",{month:"long"})+" "+y;
+  const dows=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];const dw=document.getElementById("calDow");dw.innerHTML="";dows.forEach(d=>{const e=document.createElement("div");e.className="cal-dow";e.textContent=d;dw.appendChild(e);});
+  const grid=document.getElementById("calGrid");grid.innerHTML="";const first=new Date(y,m,1);let start=(first.getDay()+6)%7;
+  for(let i=0;i<start;i++){const b=document.createElement("div");b.className="cal-cell blank";grid.appendChild(b);}
+  const dim=new Date(y,m+1,0).getDate();
+  for(let d=1;d<=dim;d++){const key=ymd(y,m,d);const s=dayStats(key);const pct=s?s.pct:0;
+    const cell=document.createElement("div");cell.className="cal-cell"+(key===todayStr()?" today":"");
+    cell.style.background=heatColor(pct);const face=pct>=100?"🌟":pct>=50?"😊":pct>0?"🙂":"🌙";
+    cell.innerHTML=`<div class="num">${d}</div><div class="face">${face}</div>${pct>0?`<div class="pct">${pct}%</div>`:""}`;
+    cell.onclick=()=>openDay(key);grid.appendChild(cell);}
+}
+function openDay(key){const d=new Date(key+"T00:00:00");document.getElementById("dayModalTitle").textContent=`${d.getMonth()+1}/${d.getDate()} ${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()]}`;
+  const dd=data[key];let body="";
+  if(!dd||(dd.hw.length===0&&(!dd.acts||ACTS.every(a=>!dd.acts[a.key]||!dd.acts[a.key].done))&&!dd.summary)){body='<div class="empty">No record for this day 🌙</div>';}
+  else{body+=`<div style="font-weight:800;margin:6px 0 2px">📚 School Work</div>`;if(dd.hw.length===0)body+='<div class="dd-row">— none —</div>';
+    dd.hw.forEach(x=>{body+=`<div class="dd-row"><span>${x.done?"✅":"⬜"}</span><span class="tagchip ${x.tag||"Other"}">${x.tag||"Other"}</span><span style="flex:1">${esc(x.text)}</span></div>`;});
+    body+=`<div style="font-weight:800;margin:10px 0 2px">🎨 Activities</div>`;
+    ACTS.forEach(a=>{const st=dd.acts&&dd.acts[a.key];if(st&&(st.done||st.min)){body+=`<div class="dd-row"><span>${a.emoji}</span><span style="flex:1">${a.name}</span><span>${st.min?st.min+" min":""}</span></div>`;}});
+    if(dd.summary)body+=`<div style="font-weight:800;margin:10px 0 2px">📝 Note</div><div class="dd-row" style="border:none">${esc(dd.summary)}</div>`;}
+  document.getElementById("dayModalBody").innerHTML=body;document.getElementById("dayModal").classList.add("show");}
+
+// ---------- actions ----------
+function addHW(){const inp=document.getElementById("hwInput");const v=inp.value.trim();if(!v)return;const tag=document.getElementById("hwTagSel").value;data[tKey].hw.push({text:v,done:false,rate:0,tag});inp.value="";save(data);render();}
+function toggleHW(i){const it=data[tKey].hw[i];it.done=!it.done;save(data);render();if(it.done){addCoins(1);cheer("School work done!","+1 🪙");}}
+function delHW(i){data[tKey].hw.splice(i,1);save(data);render();}
+function setMin(key,val){data[tKey].acts[key].min=Math.max(0,parseInt(val)||0);save(data);render();}
+function quickMin(key,add){const cur=Number(data[tKey].acts[key].min)||0;data[tKey].acts[key].min=cur+add;save(data);render();}
+function toggleAct(key){const st=data[tKey].acts[key];st.done=!st.done;if(st.done&&!st.min)st.min=15;save(data);render();if(st.done){addCoins(2);cheer("Activity done!","+2 🪙 "+(st.min||15)+" min");}}
+function addCoins(n){data.coins+=n;save(data);}
+function saveSummary(){data[tKey].summary=document.getElementById("summaryInput").value;save(data);}
+
+// ---------- voice cheer recording ----------
+let recObj=null,recChunks=[],recTimer=null;
+function toggleRec(){
+  if(recObj){stopRec();return;}
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){document.getElementById("recStatus").textContent="🎤 not available on this device";return;}
+  navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
+    const mr=window.MediaRecorder;const rec=new mr(stream);recChunks=[];
+    rec.ondataavailable=e=>{if(e.data.size)recChunks.push(e.data);};
+    rec.onstop=()=>{
+      const blob=new Blob(recChunks,{type:rec.mimeType||"audio/webm"});
+      const fr=new FileReader();fr.onload=()=>{data[tKey].voice=fr.result;save(data);renderVoice();};
+      fr.readAsDataURL(blob);
+      stream.getTracks().forEach(t=>t.stop());
+    };
+    recObj=rec;rec.start();
+    document.getElementById("recBtn").textContent="⏹ Stop";
+    document.getElementById("recStatus").textContent="🔴 recording... speak your cheer!";
+    recTimer=setTimeout(stopRec,30000); // max 30s
+  }).catch(()=>{document.getElementById("recStatus").textContent="🎤 mic blocked — allow in settings";});
+}
+function stopRec(){if(!recObj)return;try{recObj.stop();}catch(e){}clearTimeout(recTimer);recObj=null;
+  document.getElementById("recBtn").textContent="🎤 Record a cheer";document.getElementById("recStatus").textContent="✅ saved!";}
+function renderVoice(){
+  const play=document.getElementById("recPlay");
+  if(data[tKey].voice){play.style.display="inline-flex";document.getElementById("recAudio").src=data[tKey].voice;}
+  else{play.style.display="none";}
+}
+function clearRec(){data[tKey].voice="";save(data);renderVoice();document.getElementById("recStatus").textContent="";}
+
+// ---------- mystery box ----------
+const MYSTERY=[
+  {e:"🐾",t:"A secret animal winked at you!",s:"Keep your streak to meet them all!"},
+  {e:"⭐",t:"Sparkle surprise!",s:"You found a hidden star ⭐"},
+  {e:"🌟",t:"You are extra amazing today!",s:"The owl blinked at you 🦉"},
+  {e:"🎈",t:"A balloon floated by!",s:"Pop! More fun tomorrow."},
+  {e:"💎",t:"Hidden gem found!",s:"Shiny and bright, like you."},
+  {e:"🦄",t:"Magic sparkle!",s:"Unicorns love hard workers."},
+  {e:"🌈",t:"Rainbow surprise!",s:"After work comes color."},
+  {e:"🍭",t:"Sweet surprise!",s:"You earned a treat 🍬"},
+];
+function openMystery(){
+  if(data[tKey].mystery){revealMystery();return;}
+  document.getElementById("mysteryEmoji").textContent="🎁";
+  document.getElementById("mysteryTitle").textContent="Mystery Box!";
+  document.getElementById("mysteryBody").textContent="What's inside today?";
+  document.querySelector("#mysteryModal .btn").textContent="✨ Open it!";
+  document.getElementById("mysteryModal").classList.add("show");
+}
+function updateMysteryHint(){
+  const h=document.getElementById("mysteryHint");
+  if(h) h.textContent=data[tKey].mystery?"✅ opened today — come back tomorrow!":"Open once a day!";
+}
+function revealMystery(){
+  const opened=data[tKey].mystery;
+  const slot=Math.floor(Math.random()*MYSTERY.length);
+  const m=MYSTERY[slot];
+  document.getElementById("mysteryEmoji").textContent=m.e;
+  document.getElementById("mysteryTitle").textContent=opened?"Today's surprise:":m.t;
+  document.getElementById("mysteryBody").textContent=m.s;
+  const btn=document.querySelector("#mysteryModal .btn");
+  btn.textContent=opened?"Close":"🎉 Yay!";
+  if(!opened){data[tKey].mystery=true;save(data);updateMysteryHint();confettiBurst();}
+  setTimeout(()=>closeModal("mysteryModal"),opened?1500:0);
+  if(!opened)confettiBurst();
+}
+document.getElementById("hwInput").addEventListener("keydown",e=>{if(e.key==="Enter")addHW();});
+function uploadAva(e){const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{data.profile.avatar=rd.result;save(data);render();};rd.readAsDataURL(f);}
+
+function openRewardModal(){document.getElementById("rName").value="";document.getElementById("rCost").value="";document.getElementById("rewardModal").classList.add("show");}
+function addReward(){const n=document.getElementById("rName").value.trim();const c=parseInt(document.getElementById("rCost").value)||0;if(!n||c<=0)return;data.rewards.push({id:data.nextRewardId++,name:n,cost:c,used:false});save(data);closeModal("rewardModal");render();}
+let pendingRewardId=null;
+function askRedeem(id){const r=data.rewards.find(x=>x.id===id);if(!r)return;if(data.parentApproval){pendingRewardId=id;document.getElementById("approveText").textContent=`Athena wants to claim: ${r.name} (${r.cost} 🪙). Approve?`;document.getElementById("approveModal").classList.add("show");}else doRedeem(id,false);}
+function confirmRedeem(){if(pendingRewardId!=null){doRedeem(pendingRewardId,true);pendingRewardId=null;}closeModal("approveModal");}
+function doRedeem(id,approved){const r=data.rewards.find(x=>x.id===id);if(!r||r.used||data.coins<r.cost)return;
+  if(data.parentApproval&&!approved){if(data.pending.includes(id))return;data.pending.push(id);save(data);render();cheer("Sent to parent!","Waiting 👨‍👩‍👧");return;}
+  data.coins-=r.cost;r.used=true;data.pending=data.pending.filter(x=>x!==id);
+  if(!data.claims)data.claims=[];data.claims.push({name:r.name,date:todayStr()});
+  if(!data.zoo)data.zoo=[];
+  const em=r.name.trim().match(/^(\p{Emoji})/u);if(em) data.zoo.push(em[1]);
+  save(data);render();cheer("New animal adopted!","Welcome home "+r.name+" 🏡");}
+function editGoals(){const box=document.getElementById("goalInputs");box.innerHTML="";ACTS.forEach(a=>{const d=document.createElement("div");d.style.marginBottom="10px";d.innerHTML=`<label style="font-size:14px;display:flex;justify-content:space-between;align-items:center;gap:8px;"><span>${a.emoji} ${a.name}</span><input type="number" min="0" value="${data.goals[a.key]||0}" id="goal_${a.key}" style="width:90px;border:2px solid var(--pink-soft);border-radius:12px;padding:7px;font-size:14px;font-family:inherit;"></label>`;box.appendChild(d);});document.getElementById("goalModal").classList.add("show");}
+function saveGoals(){ACTS.forEach(a=>{data.goals[a.key]=Math.max(0,parseInt(document.getElementById("goal_"+a.key).value)||0);});save(data);closeModal("goalModal");render();}
+function closeModal(id){document.getElementById(id).classList.remove("show");}
+document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{if(e.target===m)m.classList.remove("show");}));
+function toggleReminder(){data.reminder=!data.reminder;save(data);render();if(data.reminder)requestNotify();}
+function toggleApproval(){data.parentApproval=!data.parentApproval;save(data);render();}
+function checkReminder(){if(!data.reminder)return;const p=ptNow();const nowKey=todayStr();if(p.hour===REMINDER_HOUR&&p.minute===REMINDER_MIN){if(data._lastRemind!==nowKey){data._lastRemind=nowKey;save(data);showToast();notify("Time for study time! 📚","It's 3:30 PM in California");confettiBurst();}}}
+function showToast(){const t=document.getElementById("toast");t.classList.add("show");setTimeout(()=>t.classList.remove("show"),8000);}
+function notify(t,b){try{if("Notification"in window&&Notification.permission==="granted")new Notification(t,{body:b});}catch(e){}}
+function requestNotify(){try{if("Notification"in window&&Notification.permission==="default")Notification.requestPermission();}catch(e){}}
+function cheer(msg,sub){const day=data[tKey];const total=day.hw.length+ACTS.length;const done=day.hw.filter(x=>x.done).length+ACTS.filter(a=>day.acts[a.key]&&day.acts[a.key].done).length;
+  document.getElementById("cheerEmoji").textContent=(total&&done===total)?"🏆":"🎉";document.getElementById("cheerMsg").textContent=(total&&done===total)?"All done!":"Yay!";document.getElementById("cheerSub").textContent=(total&&done===total)?"You're a super star ⭐":(sub||"Keep going!");
+  const c=document.getElementById("cheer");c.classList.add("show");setTimeout(()=>c.classList.remove("show"),1700);if(total&&done===total)confettiBurst();}
+document.getElementById("cheer").addEventListener("click",()=>document.getElementById("cheer").classList.remove("show"));
+function confettiBurst(){const colors=["#ff8fb6","#7cc6ff","#ffd56b","#8fe3a8","#c4a7ff"];for(let i=0;i<70;i++){const p=document.createElement("div");p.className="confetti";p.style.left=Math.random()*100+"vw";p.style.background=colors[i%colors.length];const dur=2+Math.random()*1.6;p.animate([{transform:"translateY(0) rotate(0)",opacity:1},{transform:`translateY(100vh) rotate(${720*Math.random()}deg)`,opacity:.9}],{duration:dur*1000,easing:"ease-in"});document.body.appendChild(p);setTimeout(()=>p.remove(),dur*1000);}}
+function exportData(){const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="Athena_study_backup_"+todayStr()+".json";a.click();}
+function importData(e){
+  const f=e.target.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=()=>{
+    try{
+      const imp=JSON.parse(rd.result);
+      if(!imp||typeof imp!=="object") throw 0;
+      // 1) day entries: keep local, only add days that don't exist locally (never overwrite)
+      Object.keys(imp).forEach(k=>{
+        if(/^\d{4}-\d{2}-\d{2}$/.test(k)){
+          if(!data[k]) data[k]=imp[k];           // missing day -> restore
+          // existing day -> leave local data untouched
+        }
+      });
+      // 2) scalar settings: only fill if local is missing
+      ["profile","goals","coins","rewards","zoo","wanted","_unlockedFriends","pending","claims","night","reminder","parentApproval"].forEach(k=>{
+        if(data[k]===undefined && imp[k]!==undefined) data[k]=imp[k];
+      });
+      // 3) rewards & zoo: union by id / by emoji (don't lose local ones)
+      if(Array.isArray(imp.rewards)){ const ids=new Set((data.rewards||[]).map(r=>r.id)); imp.rewards.forEach(r=>{if(!ids.has(r.id)) (data.rewards=data.rewards||[]).push(r);}); }
+      if(Array.isArray(imp.zoo)){ const set=new Set(data.zoo||[]); imp.zoo.forEach(z=>set.add(z)); data.zoo=[...set]; }
+      save(data);render();
+      document.getElementById("importFile").value="";
+      cheer("Backup restored! 🎉","All your records are back safe");
+    }catch(err){alert("That file is not a valid backup 😕");}
+  };
+  rd.readAsText(f);
+}
+function resetToday(){if(confirm("Clear today's work? (keeps all history, coins, rewards & goals)")){data[tKey]={hw:[],acts:{},summary:"",earned:0};ACTS.forEach(a=>data[tKey].acts[a.key]={done:false,min:0,rate:0});save(data);render();}}
+requestNotify();setInterval(checkReminder,20000);checkReminder();applyNight();checkBackupReminder();render();
+// auto night check every minute
+setInterval(()=>{if(data.night==="auto")applyNight();},60000);
+</script>
+</body>
+</html>
