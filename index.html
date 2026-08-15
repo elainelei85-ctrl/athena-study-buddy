@@ -148,6 +148,16 @@
   .cal-cell .pct{font-size:11px;color:var(--ink-soft);}
   .cal-cell.blank{background:transparent;cursor:default;}
   .cal-cell.today{outline:2px solid var(--pink);}
+  .cal-cell .mins{font-size:10.5px;color:#8a5cd6;font-weight:800;margin-top:1px;}
+
+  .daybar{display:flex;align-items:center;gap:8px;background:var(--card);border-radius:20px;padding:9px 12px;box-shadow:var(--shadow);margin:12px 0;}
+  .daybar .db-btn{width:34px;height:34px;border:none;border-radius:12px;background:var(--blue-soft);color:var(--blue);font-size:16px;font-weight:800;cursor:pointer;flex-shrink:0;}
+  .daybar .db-btn:active{transform:scale(.93);}
+  .daybar .db-mid{flex:1;text-align:center;}
+  .daybar .db-date{font-size:16px;font-weight:800;color:var(--ink);}
+  .daybar .db-hint{font-size:11px;color:var(--ink-soft);margin-top:1px;}
+  .daybar .db-today{border:none;border-radius:14px;background:var(--green);color:#fff;font-weight:800;font-size:13px;padding:7px 13px;cursor:pointer;}
+  .daybar .db-today:active{transform:scale(.93);}
 
   .cheer{position:fixed;inset:0;background:rgba(91,79,99,.4);display:none;align-items:center;justify-content:center;z-index:60;}
   .cheer.show{display:flex;animation:pop .3s;}
@@ -224,7 +234,7 @@
     <div class="coin">🪙 <span id="coins">0</span></div>
     <div class="trophy" id="trophyTop" title="Your streak friend">🐛 <span class="nx" id="trophyNext"></span></div>
     <div class="trophy" id="nightBtn" onclick="toggleNight()" title="Day / Night" style="top:92px;cursor:pointer">🌞</div>
-    <div class="trophy" id="trophyTop" title="Your streak friend">🐛 <span class="nx" id="trophyNext"></span></div>
+    <div class="trophy" id="flowerTop" title="Flowers collected" style="top:130px">🌸 <span id="flowerCount">0</span></div>
   </header>
 
   <div class="tabs">
@@ -249,6 +259,16 @@
       </div>
       <div class="face" id="heroFace">🌙</div>
       <div class="sub" id="heroSub">Let's get started! 💪</div>
+    </div>
+
+    <div class="daybar" id="dayBar">
+      <button class="db-btn" onclick="switchDayShift(-1)" title="Previous day">◀</button>
+      <div class="db-mid">
+        <div class="db-date" id="editDate">Today</div>
+        <div class="db-hint" id="editHint">tap a calendar day to back-fill 📅</div>
+      </div>
+      <button class="db-btn" onclick="switchDayShift(1)" title="Next day">▶</button>
+      <button class="db-today" id="backToday" onclick="switchDay(todayStr())">Today</button>
     </div>
 
     <div class="quote"><div class="qe" id="quoteEmoji">✨</div><div class="qt" id="quoteText">You are doing great, Athena!</div></div>
@@ -461,6 +481,7 @@ if(!data.goals) data.goals={...DEFAULT_GOALS};
 if(data.coins===undefined) data.coins=0;
 if(!data.rewards) data.rewards=[{id:1,name:"🐼 Panda",cost:10,used:false},{id:2,name:"🐨 Koala",cost:15,used:false},{id:3,name:"🦁 Lion",cost:25,used:false},{id:4,name:"🐢 Turtle",cost:40,used:false}];
 if(!data.nextRewardId) data.nextRewardId=4;
+if(data.flowers===undefined) data.flowers=0; // 🌸 collected by daily check-in
 if(data.reminder===undefined) data.reminder=true;
 if(data.parentApproval===undefined) data.parentApproval=true;
 if(!data.pending) data.pending=[];
@@ -508,7 +529,7 @@ function render(){
   const ava=document.getElementById("avaEmoji");
   if(data._owlUntil && Date.now()<data._owlUntil){ava.textContent="🦉";ava.style.fontSize="40px";}
   else if(data.profile.avatar) ava.innerHTML=`<img src="${data.profile.avatar}" alt="">`; else {ava.textContent="👧";ava.style.fontSize="";}
-  renderQuote();renderVoice();updateMysteryHint();
+  renderQuote();renderVoice();updateMysteryHint();renderDayBar();
   const day=data[tKey];
   document.getElementById("summaryInput").value=day.summary||"";
 
@@ -541,6 +562,7 @@ function render(){
 
   document.getElementById("coins").textContent=data.coins;
   document.getElementById("coinTag").textContent=data.coins+" 🪙";
+  document.getElementById("flowerCount").textContent=data.flowers+" 🌸";
 
   // hero ring
   const total=day.hw.length+ACTS.length;const done=day.hw.filter(x=>x.done).length+actDone;
@@ -848,10 +870,11 @@ function renderCalendar(){const now=new Date();const y=now.getFullYear(),m=now.g
   for(let i=0;i<start;i++){const b=document.createElement("div");b.className="cal-cell blank";grid.appendChild(b);}
   const dim=new Date(y,m+1,0).getDate();
   for(let d=1;d<=dim;d++){const key=ymd(y,m,d);const s=dayStats(key);const pct=s?s.pct:0;
-    const cell=document.createElement("div");cell.className="cal-cell"+(key===todayStr()?" today":"");
+    const dd=data[key];let mins=0;if(dd&&dd.acts)ACTS.forEach(a=>{mins+=(Number(dd.acts[a.key]&&dd.acts[a.key].min)||0);});
+    const cell=document.createElement("div");cell.className="cal-cell"+(key===todayStr()?" today":"")+(mins>0?" hasmin":"");
     cell.style.background=heatColor(pct);const face=pct>=100?"🌟":pct>=50?"😊":pct>0?"🙂":"🌙";
-    cell.innerHTML=`<div class="num">${d}</div><div class="face">${face}</div>${pct>0?`<div class="pct">${pct}%</div>`:""}`;
-    cell.onclick=()=>openDay(key);grid.appendChild(cell);}
+    cell.innerHTML=`<div class="num">${d}</div><div class="face">${face}</div>${pct>0?`<div class="pct">${pct}%</div>`:""}${mins>0?`<div class="mins">⏱${mins}m</div>`:""}`;
+    cell.onclick=()=>{switchDay(key);showPage("today");};grid.appendChild(cell);}
 }
 function openDay(key){const d=new Date(key+"T00:00:00");document.getElementById("dayModalTitle").textContent=`${d.getMonth()+1}/${d.getDate()} ${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()]}`;
   const dd=data[key];let body="";
@@ -872,6 +895,13 @@ function quickMin(key,add){const cur=Number(data[tKey].acts[key].min)||0;data[tK
 function toggleAct(key){const st=data[tKey].acts[key];st.done=!st.done;if(st.done&&!st.min)st.min=15;save(data);render();if(st.done){addCoins(2);cheer("Activity done!","+2 🪙 "+(st.min||15)+" min");}}
 function addCoins(n){data.coins+=n;save(data);}
 function saveSummary(){data[tKey].summary=document.getElementById("summaryInput").value;save(data);}
+// ---------- back-fill: edit any past day ----------
+function switchDay(key){tKey=key;const d=data[tKey]||(data[tKey]={hw:[],acts:{},summary:"",earned:0});if(!d.acts)d.acts={};if(d.summary===undefined)d.summary="";if(d.earned===undefined)d.earned=0;if(d.voice===undefined)d.voice="";if(d.mystery===undefined)d.mystery=false;if(d.flowerGiven===undefined)d.flowerGiven=false;ACTS.forEach(a=>{if(d.acts[a.key]===undefined)d.acts[a.key]={done:false,min:0,rate:0};});save(data);render();}
+function switchDayShift(n){const dt=new Date(tKey+"T00:00:00");dt.setDate(dt.getDate()+n);switchDay(ymd(dt.getFullYear(),dt.getMonth(),dt.getDate()));}
+function renderDayBar(){const isToday=tKey===todayStr();const dt=new Date(tKey+"T00:00:00");const lbl=isToday?"Today":(dt.getMonth()+1)+"/"+dt.getDate()+" "+["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][dt.getDay()];
+  document.getElementById("editDate").textContent=lbl;
+  document.getElementById("editHint").textContent=isToday?"tap a calendar day to back-fill 📅":"✏️ back-filling this day — your edits are saved here";
+  document.getElementById("backToday").style.display=isToday?"none":"inline-flex";}
 
 // ---------- voice cheer recording ----------
 let recObj=null,recChunks=[],recTimer=null;
@@ -964,7 +994,12 @@ function showToast(){const t=document.getElementById("toast");t.classList.add("s
 function notify(t,b){try{if("Notification"in window&&Notification.permission==="granted")new Notification(t,{body:b});}catch(e){}}
 function requestNotify(){try{if("Notification"in window&&Notification.permission==="default")Notification.requestPermission();}catch(e){}}
 function cheer(msg,sub){const day=data[tKey];const total=day.hw.length+ACTS.length;const done=day.hw.filter(x=>x.done).length+ACTS.filter(a=>day.acts[a.key]&&day.acts[a.key].done).length;
-  document.getElementById("cheerEmoji").textContent=(total&&done===total)?"🏆":"🎉";document.getElementById("cheerMsg").textContent=(total&&done===total)?"All done!":"Yay!";document.getElementById("cheerSub").textContent=(total&&done===total)?"You're a super star ⭐":(sub||"Keep going!");
+  let extra="";
+  if(tKey===todayStr()&&done>0&&!day.flowerGiven){data.flowers=(data.flowers||0)+1;day.flowerGiven=true;extra=" 🌸+1 flower!";confettiBurst();}
+  document.getElementById("cheerEmoji").textContent=(total&&done===total)?"🏆":(day.flowerGiven?"🌸":"🎉");
+  document.getElementById("cheerMsg").textContent=(total&&done===total)?"All done!":(day.flowerGiven?"Flower!":"Yay!");
+  document.getElementById("cheerSub").textContent=(total&&done===total)?"You're a super star ⭐":((sub||"Keep going!")+extra);
+  document.getElementById("flowerCount")&&(document.getElementById("flowerCount").textContent=data.flowers+" 🌸");
   const c=document.getElementById("cheer");c.classList.add("show");setTimeout(()=>c.classList.remove("show"),1700);if(total&&done===total)confettiBurst();}
 document.getElementById("cheer").addEventListener("click",()=>document.getElementById("cheer").classList.remove("show"));
 function confettiBurst(){const colors=["#ff8fb6","#7cc6ff","#ffd56b","#8fe3a8","#c4a7ff"];for(let i=0;i<70;i++){const p=document.createElement("div");p.className="confetti";p.style.left=Math.random()*100+"vw";p.style.background=colors[i%colors.length];const dur=2+Math.random()*1.6;p.animate([{transform:"translateY(0) rotate(0)",opacity:1},{transform:`translateY(100vh) rotate(${720*Math.random()}deg)`,opacity:.9}],{duration:dur*1000,easing:"ease-in"});document.body.appendChild(p);setTimeout(()=>p.remove(),dur*1000);}}
