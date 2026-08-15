@@ -86,8 +86,7 @@
   li.item.done .chk{background:var(--pink);border-color:var(--pink);}
   .txt{flex:1;min-width:90px;font-size:16px;word-break:break-word;}
   .tagchip{font-size:11px;padding:2px 9px;border-radius:20px;font-weight:800;}
-  .tagchip.Reading{background:#e3f3ff;color:#3a8fd6;} .tagchip.Math{background:#ffe0e0;color:#e06868;}
-  .tagchip.Writing{background:#fff2cc;color:#c79a18;} .tagchip.Science{background:#e4f9ec;color:#3a9a63;} .tagchip.Other{background:#efe7ff;color:#8a5cd6;}
+  .tagchip.中文{background:#ffe0ef;color:#e0689a;} .tagchip.英文{background:#e3f3ff;color:#3a8fd6;}
   .del{background:none;border:none;color:#c9a0b5;cursor:pointer;font-size:18px;padding:2px 6px;border-radius:8px;}
   .del:hover{background:#ffe0ec;}
   .empty{color:var(--ink-soft);font-size:14px;text-align:center;padding:14px;}
@@ -293,7 +292,7 @@
       <h2>📚 School Work <span class="tag" id="hwTag">0</span></h2>
       <div class="addrow">
         <input type="text" id="hwInput" placeholder="Add school work, e.g. Math worksheet p.8">
-        <select id="hwTagSel"><option>Reading</option><option>Math</option><option>Writing</option><option>Science</option><option>Other</option></select>
+        <select id="hwTagSel"><option>中文</option><option>英文</option></select>
         <button class="btn pink" onclick="addHW()">＋</button>
       </div>
       <ul class="list" id="hwList"></ul>
@@ -454,7 +453,7 @@ const MEDALS=[
   {id:"zoo5",emoji:"🏡",name:"Zoo Keeper",desc:"Adopted 5 animals in your Zoo!",test:()=>(data.zoo||[]).length>=5},
 ];
 const ACTS=[{key:"abacus",name:"Abacus 珠心算",emoji:"🧮",cls:"abacus"},{key:"piano",name:"Piano 钢琴",emoji:"🎹",cls:"piano"},{key:"beast",name:"Beast Academy",emoji:"🦁",cls:"beast"},{key:"dog",name:"Dog Man 倒霉狗",emoji:"🐶",cls:"dog"},{key:"other",name:"Other 其他",emoji:"🎨",cls:"other"}];
-const TAGS=["Reading","Math","Writing","Science","Other"];
+const TAGS=["中文","英文"];
 const DEFAULT_GOALS={abacus:60,piano:90,beast:45,dog:30};
 const REMINDER_HOUR=15, REMINDER_MIN=30;
 
