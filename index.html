@@ -371,6 +371,7 @@
       <div class="reward"><div class="r-emoji">⬆️</div><div class="r-name">Import backup (restore)</div><button class="r-btn" style="background:var(--green)" onclick="document.getElementById('importFile').click()">Import</button></div>
       <input type="file" id="importFile" accept="application/json" class="hidden" onchange="importData(event)">
       <div class="reward"><div class="r-emoji">📋</div><div class="r-name">View stored records (check if yesterday saved)</div><button class="r-btn" style="background:var(--purple)" onclick="viewData()">View</button></div>
+      <div class="reward"><div class="r-emoji">💾</div><div class="r-name">Auto-saved on this device (double storage: localStorage + IndexedDB)</div><button class="r-btn" style="background:var(--green)" onclick="save(data);alert('💾 Saved! Your data is stored safely on this device.')">Save now</button></div>
       <div class="reward"><div class="r-emoji">🧹</div><div class="r-name">Clear TODAY only</div><button class="r-btn" style="background:#ff9a9a" onclick="resetToday()">Clear</button></div>
     </section>
     <div id="dataView" class="hidden" style="margin-top:10px"></div>
@@ -440,7 +441,18 @@ const REMINDER_HOUR=15, REMINDER_MIN=30;
 function todayStr(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
 function ymd(y,m,d){return `${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;}
 function load(){try{return JSON.parse(localStorage.getItem(STORE_KEY))||{}}catch(e){return{}}}
-function save(d){try{localStorage.setItem(STORE_KEY,JSON.stringify(d));}catch(e){alert("⚠️ Could not save! This device's storage may be full or blocked (e.g. Private Mode). Your changes won't be kept. Try Safari normal mode and re-open the app.");}}
+function save(d,skipCloud){try{localStorage.setItem(STORE_KEY,JSON.stringify(d));}catch(e){}
+  idbSave(d);} // mirror to IndexedDB (more durable than localStorage on iOS)
+// ---------- IndexedDB mirror (survives refresh / storage quirks on iPad) ----------
+let _idb=null,_idbTimer=null,_idbPending=null;
+function idbOpen(){return new Promise((res,rej)=>{try{if(_idb){res(_idb);return;}const r=indexedDB.open("athena_study_buddy_db",1);
+  r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains("data"))r.result.createObjectStore("data");};
+  r.onsuccess=()=>{_idb=r.result;res(_idb);};r.onerror=()=>rej();}catch(e){rej();}});}
+function idbSave(d){_idbPending=JSON.parse(JSON.stringify(d)); // latest snapshot
+  if(_idbTimer) return; _idbTimer=setTimeout(()=>{_idbTimer=null; if(!_idbPending)return; const snap=_idbPending;_idbPending=null;
+    idbOpen().then(db=>{const tx=db.transaction("data","readwrite");tx.objectStore("data").put(JSON.stringify(snap),"main");}).catch(()=>{});},800);}
+function idbLoad(){return new Promise(res=>{try{idbOpen().then(db=>{const rq=db.transaction("data","readonly").objectStore("data").get("main");
+  rq.onsuccess=()=>res(rq.result?JSON.parse(rq.result):null);rq.onerror=()=>res(null);}).catch(()=>res(null));}catch(e){res(null);}});}
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
 
 let data=load();
@@ -464,7 +476,7 @@ if(data[tKey].earned===undefined) data[tKey].earned=0;
 if(data[tKey].voice===undefined) data[tKey].voice=""; // base64 audio
 if(data[tKey].mystery===undefined) data[tKey].mystery=false; // mystery box opened today
 ACTS.forEach(a=>{if(data[tKey].acts[a.key]===undefined) data[tKey].acts[a.key]={done:false,min:0,rate:0};});
-save(data);
+save(data,true); // do NOT push to cloud yet — wait for cloudPull() to finish first
 
 function weekKeys(){const now=new Date();const idx=now.getDay();const mon=(idx+6)%7;const keys=[];for(let k=0;k<7;k++){const d=new Date(now);d.setDate(now.getDate()-mon+k);keys.push(ymd(d.getFullYear(),d.getMonth(),d.getDate()));}return keys;}
 function ptNow(){const f=new Intl.DateTimeFormat("en-US",{timeZone:"America/Los_Angeles",hour12:false,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"});const p={};f.formatToParts(new Date()).forEach(x=>{if(x.type!=="literal")p[x.type]=+x.value;});return p;}
@@ -997,7 +1009,12 @@ function viewData(){
   box.className="section";
   box.innerHTML=`<h2>📋 Stored records (last ${Math.min(30,total)} of ${total} days)</h2><div style="background:#fff;border-radius:14px;padding:10px 14px">${rows}</div><div class="tip parishint" style="margin-top:8px">If yesterday is missing here, the data was never saved or this device's storage was cleared.</div>`;
 }
-requestNotify();setInterval(checkReminder,20000);checkReminder();applyNight();checkBackupReminder();render();
+requestNotify();setInterval(checkReminder,20000);checkReminder();applyNight();checkBackupReminder();
+// restore from IndexedDB first (more durable than localStorage on iPad); fall back to localStorage
+idbLoad().then(remote=>{ if(remote&&typeof remote==="object"){Object.keys(remote).forEach(k=>{data[k]=remote[k];});try{localStorage.setItem(STORE_KEY,JSON.stringify(data));}catch(e){}}
+  if(!data[tKey]) data[tKey]={hw:[],acts:{},summary:"",earned:0};
+  ACTS.forEach(a=>{if(data[tKey].acts[a.key]===undefined) data[tKey].acts[a.key]={done:false,min:0,rate:0};});
+  render(); });
 // auto night check every minute
 setInterval(()=>{if(data.night==="auto")applyNight();},60000);
 </script>
