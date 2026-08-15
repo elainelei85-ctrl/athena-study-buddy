@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
 <title>✨ Athena's Study Buddy</title>
 <style>
   :root{
@@ -1051,6 +1054,8 @@ idbLoad().then(remote=>{ if(remote&&typeof remote==="object"){Object.keys(remote
   render(); });
 // auto night check every minute
 setInterval(()=>{if(data.night==="auto")applyNight();},60000);
+// register service worker → turns the home-screen icon into a real app with its own persistent storage
+if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(()=>{}); }
 </script>
 </body>
 </html>
