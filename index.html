@@ -370,8 +370,10 @@
       <div class="reward"><div class="r-emoji">⬇</div><div class="r-name">Export backup (JSON)</div><button class="r-btn" style="background:var(--blue)" onclick="exportData()">Export</button></div>
       <div class="reward"><div class="r-emoji">⬆️</div><div class="r-name">Import backup (restore)</div><button class="r-btn" style="background:var(--green)" onclick="document.getElementById('importFile').click()">Import</button></div>
       <input type="file" id="importFile" accept="application/json" class="hidden" onchange="importData(event)">
+      <div class="reward"><div class="r-emoji">📋</div><div class="r-name">View stored records (check if yesterday saved)</div><button class="r-btn" style="background:var(--purple)" onclick="viewData()">View</button></div>
       <div class="reward"><div class="r-emoji">🧹</div><div class="r-name">Clear TODAY only</div><button class="r-btn" style="background:#ff9a9a" onclick="resetToday()">Clear</button></div>
     </section>
+    <div id="dataView" class="hidden" style="margin-top:10px"></div>
   </div>
 
   <footer>💡 Saved on this device. Parents: export monthly to keep a backup.</footer>
@@ -438,7 +440,7 @@ const REMINDER_HOUR=15, REMINDER_MIN=30;
 function todayStr(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
 function ymd(y,m,d){return `${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;}
 function load(){try{return JSON.parse(localStorage.getItem(STORE_KEY))||{}}catch(e){return{}}}
-function save(d){localStorage.setItem(STORE_KEY,JSON.stringify(d));}
+function save(d){try{localStorage.setItem(STORE_KEY,JSON.stringify(d));}catch(e){alert("⚠️ Could not save! This device's storage may be full or blocked (e.g. Private Mode). Your changes won't be kept. Try Safari normal mode and re-open the app.");}}
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
 
 let data=load();
@@ -984,6 +986,17 @@ function importData(e){
   rd.readAsText(f);
 }
 function resetToday(){if(confirm("Clear today's work? (keeps all history, coins, rewards & goals)")){data[tKey]={hw:[],acts:{},summary:"",earned:0};ACTS.forEach(a=>data[tKey].acts[a.key]={done:false,min:0,rate:0});save(data);render();}}
+function viewData(){
+  const box=document.getElementById("dataView");
+  const keys=Object.keys(data).filter(k=>/^\d{4}-\d{2}-\d{2}$/.test(k)).sort().reverse();
+  if(keys.length===0){box.className="";box.innerHTML='<div class="empty">No day records found. Nothing has been saved yet.</div>';return;}
+  let rows="";
+  keys.slice(0,30).forEach(k=>{const s=dayStats(k);const acts=ACTS.map(a=>{const st=data[k].acts&&data[k].acts[a.key];return st&&(st.done||st.min)?`${a.emoji}${st.min}m`:null;}).filter(Boolean).join(" ");
+    rows+=`<div style="display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px solid #eee;font-size:13px"><span><b>${k}</b>${k===tKey?" (today)":""}</span><span style="color:#8a5cd6">${acts||"— no activity —"}</span></div>`;});
+  const total=keys.length;
+  box.className="section";
+  box.innerHTML=`<h2>📋 Stored records (last ${Math.min(30,total)} of ${total} days)</h2><div style="background:#fff;border-radius:14px;padding:10px 14px">${rows}</div><div class="tip parishint" style="margin-top:8px">If yesterday is missing here, the data was never saved or this device's storage was cleared.</div>`;
+}
 requestNotify();setInterval(checkReminder,20000);checkReminder();applyNight();checkBackupReminder();render();
 // auto night check every minute
 setInterval(()=>{if(data.night==="auto")applyNight();},60000);
